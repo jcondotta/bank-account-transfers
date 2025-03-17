@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: bank-account-transfers
+
+  logging:
+    level:
+      root: debug
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testuser
+    password: testpass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update  # ✅ Ensures Hibernate creates tables
+    show-sql: true      # ✅ Logs all SQL queries
+    properties:
+      hibernate:
+        format_sql: true # ✅ Formats queries for better readability
