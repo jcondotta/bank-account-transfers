@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: bank-account-transfers
+  locale:
+    default: "en"
+
+bank-account-service:
+  api:
+    v1:
+      base-url: 'http://localhost:8080/'
+      find-by-iban:
+        url: 'api/v1/bank-accounts/iban/{iban}'
+
+management:
+  metrics:
+    enable:
+      all: true
+  tracing:
+    enabled: true
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  metrics:
+#    enable:
+#      all: true
+#    tags:
+#      application: bank-account-transfers
+
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/your_database
+#    username: your_username
+#    password: your_password
+#    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # or "validate" if schema is already created
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+#aws:
+#  access-key-id: ${AWS_ACCESS_KEY_ID}
+#  secret-key: ${AWS_SECRET_ACCESS_KEY}
+#  region: ${AWS_REGION}
+#
+#  dynamodb:
+#    endpoint: ${AWS_DYNAMODB_ENDPOINT}
+#    tables:
+#      bank-transfer-entity:
+#        table-name: bank_transfer_table
