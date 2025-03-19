@@ -16,9 +16,6 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 @ExtendWith(MockitoExtension.class)
 class CreateBankTransferServiceTest {
 

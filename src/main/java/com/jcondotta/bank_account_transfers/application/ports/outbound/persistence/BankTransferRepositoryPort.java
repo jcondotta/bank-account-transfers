@@ -2,7 +2,6 @@ package com.jcondotta.bank_account_transfers.application.ports.outbound.persiste
 
 import com.jcondotta.bank_account_transfers.domain.BankTransfer;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

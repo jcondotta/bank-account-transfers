@@ -5,9 +5,6 @@ import com.jcondotta.bank_account_transfers.argument_provider.BlankValuesArgumen
 import com.jcondotta.bank_account_transfers.infrastructure.config.TestValidatorConfig;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;

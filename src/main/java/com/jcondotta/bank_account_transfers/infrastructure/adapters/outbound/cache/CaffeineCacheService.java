@@ -64,7 +64,7 @@ public class CaffeineCacheService<K, V> implements CacheService<K, V> {
             return value.orElse(null);
 
         })).map(value -> {
-            LOGGER.trace("Cache hit: Key='{}' -> Value={}", cacheKey, value);
+            LOGGER.debug("Cache hit: Key='{}' -> Value={}", cacheKey, value);
             return value;
         });
     }

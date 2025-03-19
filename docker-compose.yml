@@ -1,87 +1,47 @@
 version: '3.9'
 
 services:
-  bank-transfer-service:
+  bank-account-transfers-service:
     build:
       context: .
-    container_name: bank-transfer-service
+#    container_name: bank-account-transfers-service #TODO think about the docker image
     restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bank_transfers_db
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: admin_password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update  # ✅ Optional: Automatically updates schema
+      DATASOURCE_URL: jdbc:postgresql://postgres:5432/bank_account_transfers_db
+      DATASOURCE_USERNAME: admin
+      DATASOURCE_PASSWORD: admin_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop #TODO ARRUMAR ISSO PRA PRODUCAO
+      SPRING_PROFILES_ACTIVE: dev  # 👈 Set the profile to dev
     ports:
       - "8080:8080"
-#    networks:
-#      - my_network
+    networks:
+      - bank_account_transfers_network
 
   postgres:
     image: postgres:16-alpine
-    container_name: bank_transfers_postgres_db
+    container_name: bank_account_transfers_postgres_db
     restart: always
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin_password
-      POSTGRES_DB: bank_transfers_db
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data  # ✅ Persists data across container restarts
-#    networks:
-#      - my_network
+      POSTGRES_DB: bank_account_transfers_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bank_account_transfers_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d bank_account_transfers_db || exit 1" ]
+      interval: 10s
+      retries: 5
+      start_period: 10s
 
-#volumes:
-#  postgres_data:  # Defines a volume for persistent data storage
-#
-#networks:
-#  my_network:  # Defines an isolated network
-#
-#
-#
-#version: '3'
-#services:
-#
-#  sti-postgres:
-#    image: "postgres:9.6-alpine"
-#    container_name: sti-postgres
-#    environment:
-#      - POSTGRES_DB=spacetours
-#      - POSTGRES_USER=stiuser
-#      - POSTGRES_PASSWORD=stipass
-#
-#  propellant-markt-inc-mock:
-#    image: "mockserver/mockserver"
-#    container_name: propellant-markt-inc-mock
-#    ports:
-#      - 1080:1080
-#    environment:
-#      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/expectations.json
-#    volumes:
-#      - type: bind
-#        source: ./propellant-markt-inc-mock
-#        target: /config
-#
-#  space-tours-inc-backend:
-#    build: ./space-tours-inc-backend
-#    container_name: space-tours-inc-backend
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=development
-#      - STI_DB_URL=jdbc:postgresql://sti-postgres:5432/spacetours
-#      - STI_DB_USERNAME=stiuser
-#      - STI_DB_PASSWORD=stipass
-#      - STI_PROPELLANT_BASEURI=http://propellant-markt-inc-mock:1080
-#    ports:
-#      - 8080:8080
-#    links:
-#      - sti-postgres
-#
-#  space-tours-inc-frontend:
-#    build: ./space-tours-inc-frontend
-#    container_name: space-tours-inc-frontend
-#    ports:
-#      - 4200:80
-#    links:
-#      - space-tours-inc-backend
+volumes:
+  postgres_data:
+
+networks:
+  bank_account_transfers_network:

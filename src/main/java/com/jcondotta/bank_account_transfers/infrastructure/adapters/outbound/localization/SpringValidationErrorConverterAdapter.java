@@ -1,19 +1,17 @@
 package com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.localization;
 
 import com.jcondotta.bank_account_transfers.application.ports.inbound.LocaleResolverPort;
-import com.jcondotta.bank_account_transfers.application.ports.outbound.validation.ValidationErrorConverterPort;
 import com.jcondotta.bank_account_transfers.application.ports.outbound.localization.MessageResolverPort;
+import com.jcondotta.bank_account_transfers.application.ports.outbound.validation.ValidationErrorConverterPort;
 import com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest.FieldValidationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

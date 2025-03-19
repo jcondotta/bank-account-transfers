@@ -1,9 +1,35 @@
 spring:
   application:
     name: bank-account-transfers
-  locale:
-    default: "en"
+#  locale:
+#    default: "en"
 
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: ${DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+  #TODO adjust it for production
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # For dev/testing only; use 'update' or 'validate' in production
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+#springdoc:
+#  swagger-ui:
+#    path: /swagger-ui.html
+##    display-request-duration: true
+#    syntax-highlight.theme: "arta"
+##    operationsSorter: "alpha"
+##    tagsSorter: "alpha"
+##    persistAuthorization: true
+#    custom-css: "/static/swagger-custom.css"
+##    custom-js: "/static/swagger-config.js"
+
+#TODO adjust it for production
 bank-account-service:
   api:
     v1:
@@ -11,12 +37,16 @@ bank-account-service:
       find-by-iban:
         url: 'api/v1/bank-accounts/iban/{iban}'
 
-management:
-  metrics:
-    enable:
-      all: true
-  tracing:
-    enabled: true
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"  # Expose all available actuator endpoints
+#  metrics:
+#    enable:
+#      all: true
+#    tags:
+#      application: bank-account-transfers  # Add a custom tag to all metrics
 
 #management:
 #  endpoints:
@@ -28,19 +58,6 @@ management:
 #      all: true
 #    tags:
 #      application: bank-account-transfers
-
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/your_database
-#    username: your_username
-#    password: your_password
-#    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop # or "validate" if schema is already created
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
 
 #aws:
 #  access-key-id: ${AWS_ACCESS_KEY_ID}

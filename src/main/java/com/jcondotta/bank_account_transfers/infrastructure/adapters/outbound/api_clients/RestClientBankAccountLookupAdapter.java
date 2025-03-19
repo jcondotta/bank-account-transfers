@@ -4,16 +4,16 @@ import com.jcondotta.bank_account_transfers.application.ports.outbound.api_clien
 import com.jcondotta.bank_account_transfers.infrastructure.config.BankAccountServiceV1Config;
 import io.micrometer.core.annotation.Timed;
 import jakarta.validation.constraints.NotNull;
-import net.logstash.logback.argument.StructuredArguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.*;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Optional;
 
-import static org.springframework.http.MediaType.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Component
 public class RestClientBankAccountLookupAdapter implements BankAccountLookupPort {
@@ -33,7 +33,7 @@ public class RestClientBankAccountLookupAdapter implements BankAccountLookupPort
             percentiles = {0.5, 0.9, 0.99})
     public Optional<BankAccountDTO> findBankAccountByIban(@NotNull(message = "bankAccount.iban.notNull") String bankAccountIban) {
         try {
-            LOGGER.info("Fetching bank account by: {}", StructuredArguments.kv("iban", bankAccountIban));
+//            LOGGER.info("Fetching bank account by: {}", StructuredArguments.kv("iban", bankAccountIban));
             var bankAccountByIbanURI = bankAccountServiceV1Config.findBankAccountByIbanURI(bankAccountIban);
 
             return Optional.ofNullable(
@@ -43,18 +43,18 @@ public class RestClientBankAccountLookupAdapter implements BankAccountLookupPort
                             .retrieve()
                             .body(BankAccountDTO.class)
             ).map(bankAccountDTO -> {
-                LOGGER.info("Bank account successfully retrieved: {}", StructuredArguments.f(bankAccountDTO));
+//                LOGGER.info("Bank account successfully retrieved: {}", StructuredArguments.f(bankAccountDTO));
                 return bankAccountDTO;
             });
         }
         catch (RestClientResponseException e) {
-            LOGGER.error("Bank account lookup failed: {} {} {}",
-                    StructuredArguments.kv("status", e.getStatusCode()),
-                    StructuredArguments.kv("iban", bankAccountIban),
-                    StructuredArguments.kv("error", e.getResponseBodyAsString()), e);
+//            LOGGER.error("Bank account lookup failed: {} {} {}",
+//                    StructuredArguments.kv("status", e.getStatusCode()),
+//                    StructuredArguments.kv("iban", bankAccountIban),
+//                    StructuredArguments.kv("error", e.getResponseBodyAsString()), e);
 
         } catch (Exception e) {
-            LOGGER.error("Unexpected error during bank account lookup: {}", StructuredArguments.kv("iban", bankAccountIban), e);
+//            LOGGER.error("Unexpected error during bank account lookup: {}", StructuredArguments.kv("iban", bankAccountIban), e);
         }
         return Optional.empty();
     }

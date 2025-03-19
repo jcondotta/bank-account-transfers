@@ -6,9 +6,9 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static io.swagger.v3.oas.annotations.media.Schema.*;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 
-@Schema(description = "Universal DTO for handling bank transfers (internal or external).")
+@Schema(description = "DTO for handling internal bank transfers.")
 public record CreateBankTransferRequest(
 
     @NotNull(message = "transfer.senderBankAccountId.notNull")
@@ -28,7 +28,7 @@ public record CreateBankTransferRequest(
     @NotNull(message = "transfer.amount.notNull")
     @Positive(message = "transfer.amount.positive")
     @Digits(integer = 12, fraction = 2, message = "transfer.amount.invalidPrecision")
-    @Schema(description = "Amount of transfer (max 12 digits, 2 decimal places)", requiredMode = RequiredMode.REQUIRED, example = "250.00")
+    @Schema(description = "Amount of transfer (max 12 digits, 2 decimal places)", requiredMode = RequiredMode.REQUIRED, example = "250.17")
     BigDecimal amount,
 
     @NotNull(message = "transfer.currency.notNull")

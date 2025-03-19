@@ -3,7 +3,6 @@ package com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.ap
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.UUID;
 
 public interface BankAccountAPIPaths {
 

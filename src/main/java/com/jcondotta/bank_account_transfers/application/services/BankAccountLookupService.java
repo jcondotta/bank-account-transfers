@@ -1,9 +1,9 @@
 package com.jcondotta.bank_account_transfers.application.services;
 
-import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.api_clients.BankAccountDTO;
 import com.jcondotta.bank_account_transfers.application.ports.outbound.api_clients.BankAccountLookupPort;
 import com.jcondotta.bank_account_transfers.application.ports.outbound.cache.CacheService;
 import com.jcondotta.bank_account_transfers.application.usecases.BankAccountLookupUseCase;
+import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.api_clients.BankAccountDTO;
 import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.cache.BankAccountCacheKeys;
 import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;

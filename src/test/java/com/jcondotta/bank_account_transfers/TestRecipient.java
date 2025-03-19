@@ -1,7 +1,5 @@
 package com.jcondotta.bank_account_transfers;
 
-import java.util.UUID;
-
 public enum TestRecipient {
 
 //    JEFFERSON(

@@ -43,6 +43,7 @@ public class MethodArgumentNotValidExceptionHandler {
                         .collect(Collectors.joining(", "))
         );
 
+
         var problem = Problem.builder()
                 .withStatus(Status.BAD_REQUEST)
                 .withTitle(Status.BAD_REQUEST.getReasonPhrase())

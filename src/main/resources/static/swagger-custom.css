@@ -1,0 +1,77 @@
+/* Set background and text colors */
+body {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Customize the top navigation bar */
+.topbar {
+    background-color: #1E1E1E !important;
+    border-bottom: 3px solid #00C853 !important; /* Green accent */
+}
+
+/* Change API title color */
+.title {
+    color: #FFFFFF !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+}
+
+/* Update button styles */
+.btn {
+    background-color: #00C853 !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+/* Style API sections */
+.opblock {
+    background-color: #1E1E1E !important;
+    border: 1px solid #00C853 !important;
+}
+
+/* Adjust text inside each section */
+.opblock-summary {
+    color: #ffffff !important;
+}
+
+/* Change API method colors */
+.opblock.opblock-get {
+    background-color: #0D47A1 !important;
+}
+
+.opblock.opblock-post {
+    background-color: #1B5E20 !important;
+}
+
+.opblock.opblock-put {
+    background-color: #FF6F00 !important;
+}
+
+.opblock.opblock-delete {
+    background-color: #B71C1C !important;
+}
+
+/* Style response and parameter sections */
+.parameters,
+.responses {
+    background-color: #1E1E1E !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Adjust dropdown and input field colors */
+select,
+input {
+    background-color: #2A2A2A !important;
+    color: #FFFFFF !important;
+    border: 1px solid #00C853 !important;
+}
+
+/* Change "Try it out" button color */
+.try-out {
+    background-color: #00C853 !important;
+    color: white !important;
+    font-weight: bold !important;
+}

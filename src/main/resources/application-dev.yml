@@ -1,11 +1,11 @@
 spring:
-  application:
-    name: bank-account-transfers
-
+  config:
+    import: classpath:openapi-config.yml
+  datasource.url
 #  datasource:
-#    url: jdbc:postgresql://localhost:5432/your_database
-#    username: your_username
-#    password: your_password
+#    url: jdbc:postgresql://localhost:5432/bank_account_transfers_db
+#    username: admin
+#    password: admin_password
 #    driver-class-name: org.postgresql.Driver
 #  jpa:
 #    hibernate:

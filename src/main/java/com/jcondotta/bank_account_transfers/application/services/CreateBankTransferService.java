@@ -3,9 +3,9 @@ package com.jcondotta.bank_account_transfers.application.services;
 import com.jcondotta.bank_account_transfers.application.ports.outbound.persistence.BankTransferRepositoryPort;
 import com.jcondotta.bank_account_transfers.application.usecases.CreateBankTransferUseCase;
 import com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest.CreateBankTransferRequest;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-import net.logstash.logback.argument.StructuredArguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,24 +30,28 @@ public class CreateBankTransferService implements CreateBankTransferUseCase {
     }
 
     @Override
+    @Timed(value = "bankTransfers.createBankTransfer2.time", description = "Time taken to create a bank transfer")
     public BankTransferDTO createBankTransfer(UUID idempotencyKey, CreateBankTransferRequest request) {
         Objects.requireNonNull(idempotencyKey, "idempotencyKey.notNull");
 
-        LOGGER.info("Processing bank transfer with Idempotency-Key: {}", idempotencyKey, StructuredArguments.f(request));
+//        LOGGER.info("Processing bank transfer with Idempotency-Key: {}", idempotencyKey, StructuredArguments.f(request));
         var constraintViolations = validator.validate(request);
         if (!constraintViolations.isEmpty()) {
             var validationMessages = constraintViolations.stream()
                     .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                     .collect(Collectors.joining(", "));
 
-            LOGGER.warn("Validation failed with Idempotency-Key: {}. Violations: [{}]", idempotencyKey,
-                    validationMessages, StructuredArguments.f(request));
+//            LOGGER.warn("Validation failed with Idempotency-Key: {}. Violations: [{}]", idempotencyKey,
+//                    validationMessages, StructuredArguments.f(request));
 
             throw new ConstraintViolationException(constraintViolations);
         }
 
         return bankTransferRepositoryPort.findByIdempotencyKey(idempotencyKey)
-                .map(BankTransferDTO::new)
+                .map(existingTransfer -> {
+                    LOGGER.debug("Repeated request detected: BankTransfer with Idempotency-Key={} already exists. Returning existing transfer.", idempotencyKey);
+                    return new BankTransferDTO(existingTransfer);
+                })
                 .orElseGet(() -> {
                     var bankTransfer = createInternalBankTransferService.processTransaction(idempotencyKey, request);
                     bankTransferRepositoryPort.save(bankTransfer);

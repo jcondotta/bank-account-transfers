@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-account-transfers-deployment
+  labels:
+    app: bank-account-transfers
+spec:
+  replicas: 3  # Number of replicas
+  selector:
+    matchLabels:
+      app: bank-account-transfers
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1     # Allow 1 extra pod above desired count during update
+      maxUnavailable: 1  # Allow 1 pod to be unavailable during update
+  template:
+    metadata:
+      labels:
+        app: bank-account-transfers
+    spec:
+      containers:
+        - name: bank-account-transfers
+          image: bank-account-transfers:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+#            - name: DATABASE_URL
+#              value: "jdbc:postgresql://172.18.0.3:5432/bank_db"
+#            - name: POSTGRES_USER
+#              value: "admin"
+#            - name: POSTGRES_PASSWORD
+#              value: "password"
+#            - name: REDIS_HOST
+#              value: "redis"

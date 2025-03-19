@@ -6,12 +6,12 @@ import com.jcondotta.bank_account_transfers.domain.BankTransfer;
 import com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest.CreateBankTransferRequest;
 import com.jcondotta.bank_account_transfers.infrastructure.config.mapper.FinancialTransactionMapper;
 import com.jcondotta.bank_account_transfers.infrastructure.config.mapper.InternalBankTransferMapper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.util.UUID;
 
-@Component
+@Service
 public class CreateInternalBankTransferService {
 
     private final InternalBankTransferMapper bankTransferMapper;

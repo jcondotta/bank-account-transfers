@@ -1,0 +1,35 @@
+openapi:
+  version: 1.0
+  title: Bank Transfers API Specification
+  description: >
+    This service is responsible for processing bank transfers securely and efficiently.
+    It provides RESTful APIs for initiating, tracking, and managing money transfers.
+    Features include real-time status updates, fraud detection, and integration with
+    external payment providers.
+  contact:
+    name: Jefferson Condotta
+    email: jefferson.condotta@gmail.com
+    url: https://jcondotta.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  terms-of-service: https://jcondotta.io/terms
+  server-urls:
+    - url: http://localhost:8080
+      description: Local Development Server
+    - url: https://api.jcondotta.io
+      description: Production API Server
+  tags:
+    - name: Transfers
+      description: Handles bank transfers between accounts
+    - name: Accounts
+      description: Manages bank accounts and balances
+    - name: Transactions
+      description: Provides transaction history and details
+  security:
+    type: bearer
+    scheme: JWT
+    description: "Use a JWT token to authenticate requests."
+  rate-limits:
+    free-tier: "1000 requests per hour"
+    premium-tier: "Unlimited"

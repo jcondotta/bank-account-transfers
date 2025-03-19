@@ -1,7 +1,5 @@
 package com.jcondotta.bank_account_transfers.domain;
 
-import java.util.UUID;
-
 public class BankAccountNotFoundException extends RuntimeException {
 
 //    private final UUID bankAccountId;
