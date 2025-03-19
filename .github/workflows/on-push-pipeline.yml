@@ -27,11 +27,11 @@ jobs:
         run: |
           mvn clean package --batch-mode
 
-#      - name: Upload Unit Test Coverage Report
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: jacoco-unit-tests-exec
-#          path: target/jacoco-unit-tests.exec
+      - name: Upload Unit Test Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-unit-tests-exec
+          path: target/jacoco-unit-tests.exec
 
 #  # Phase 2: Setup Docker Images and Run Integration Tests
 #  integration-tests:
