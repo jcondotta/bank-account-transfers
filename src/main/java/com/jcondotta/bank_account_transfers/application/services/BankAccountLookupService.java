@@ -1,7 +1,7 @@
 package com.jcondotta.bank_account_transfers.application.services;
 
 import com.jcondotta.bank_account_transfers.application.ports.outbound.api_clients.BankAccountLookupPort;
-import com.jcondotta.bank_account_transfers.application.ports.outbound.cache.CacheService;
+import com.jcondotta.bank_account_transfers.application.ports.outbound.cache.CacheStore;
 import com.jcondotta.bank_account_transfers.application.usecases.BankAccountLookupUseCase;
 import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.api_clients.BankAccountDTO;
 import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.cache.BankAccountCacheKeys;
@@ -17,11 +17,11 @@ public class BankAccountLookupService implements BankAccountLookupUseCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BankAccountLookupService.class);
 
-    private final CacheService<String, BankAccountDTO> cacheService;
-    private final BankAccountLookupPort bankAccountLookupPort;
+    private final CacheStore<String, BankAccountDTO> cacheStore;
+    private final BankAccountLookupPort<BankAccountDTO> bankAccountLookupPort;
 
-    public BankAccountLookupService(CacheService<String, BankAccountDTO> cacheService, BankAccountLookupPort bankAccountLookupPort) {
-        this.cacheService = cacheService;
+    public BankAccountLookupService(CacheStore<String, BankAccountDTO> cacheStore, BankAccountLookupPort<BankAccountDTO> bankAccountLookupPort) {
+        this.cacheStore = cacheStore;
         this.bankAccountLookupPort = bankAccountLookupPort;
     }
 
@@ -33,7 +33,10 @@ public class BankAccountLookupService implements BankAccountLookupUseCase {
     public Optional<BankAccountDTO> findBankAccountByIban(String bankAccountIban) {
         var cacheKey = BankAccountCacheKeys.bankAccountIbanKey(bankAccountIban);
 
-        LOGGER.info("Checking cache for bank account IBAN: {}", bankAccountIban);
-        return cacheService.getOrFetch(cacheKey, key -> bankAccountLookupPort.findBankAccountByIban(bankAccountIban));
+        LOGGER.atInfo().setMessage("Checking cache by bank account iban: {}")
+                .addArgument(bankAccountIban)
+                .addKeyValue("bankAccountIban", bankAccountIban).log();
+
+        return cacheStore.getOrFetch(cacheKey, key -> bankAccountLookupPort.findBankAccountByIban(bankAccountIban));
     }
 }

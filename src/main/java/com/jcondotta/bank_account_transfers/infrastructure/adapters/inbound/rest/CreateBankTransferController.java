@@ -1,6 +1,5 @@
 package com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest;
 
-import com.jcondotta.bank_account_transfers.application.services.BankTransferDTO;
 import com.jcondotta.bank_account_transfers.application.usecases.CreateBankTransferUseCase;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;

@@ -2,6 +2,7 @@ spring:
   application:
     name: bank-account-transfers
 
+
   logging:
     level:
       root: debug
@@ -18,3 +19,7 @@ spring:
     properties:
       hibernate:
         format_sql: true # ✅ Formats queries for better readability
+logging:
+  structured:
+    format:
+      console: ecs

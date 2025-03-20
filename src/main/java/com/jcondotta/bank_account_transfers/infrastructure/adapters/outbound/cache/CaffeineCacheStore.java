@@ -1,7 +1,7 @@
 package com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.jcondotta.bank_account_transfers.application.ports.outbound.cache.CacheService;
+import com.jcondotta.bank_account_transfers.application.ports.outbound.cache.CacheStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,13 +9,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class CaffeineCacheService<K, V> implements CacheService<K, V> {
+public class CaffeineCacheStore<K, V> implements CacheStore<K, V> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CaffeineCacheService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CaffeineCacheStore.class);
 
     private final Cache<K, V> cache;
 
-    public CaffeineCacheService(Cache<K, V> cache) {
+    public CaffeineCacheStore(Cache<K, V> cache) {
         this.cache = cache;
     }
 
@@ -28,7 +28,9 @@ public class CaffeineCacheService<K, V> implements CacheService<K, V> {
 
         cache.put(cacheKey, cacheValue);
 
-        LOGGER.info("Cache store: Key='{}' successfully stored in cache.", cacheKey);
+        LOGGER.atInfo().setMessage("Cache store: Key='{}' successfully stored in cache.")
+                .addArgument(cacheKey)
+                .addKeyValue("cacheKey", cacheKey).log();
     }
 
     @Override
@@ -40,7 +42,9 @@ public class CaffeineCacheService<K, V> implements CacheService<K, V> {
             LOGGER.info("Cache hit: Key='{}' -> Value={}", cacheKey, cachedValue);
         }
         else {
-            LOGGER.info("Cache miss: Key='{}' not found.", cacheKey);
+            LOGGER.atInfo().setMessage("Cache miss: Key='{}' not found.")
+                    .addArgument(cacheKey)
+                    .addKeyValue("cacheKey", cacheKey).log();
         }
 
         return Optional.ofNullable(cachedValue);

@@ -2,6 +2,7 @@ package com.jcondotta.bank_account_transfers.application.services;
 
 import com.jcondotta.bank_account_transfers.application.ports.outbound.persistence.BankTransferRepositoryPort;
 import com.jcondotta.bank_account_transfers.application.usecases.CreateBankTransferUseCase;
+import com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest.BankTransferDTO;
 import com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest.CreateBankTransferRequest;
 import io.micrometer.core.annotation.Timed;
 import jakarta.validation.ConstraintViolationException;

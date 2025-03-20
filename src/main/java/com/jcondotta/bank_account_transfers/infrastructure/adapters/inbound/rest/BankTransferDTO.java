@@ -1,7 +1,6 @@
-package com.jcondotta.bank_account_transfers.application.services;
+package com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest;
 
 import com.jcondotta.bank_account_transfers.domain.BankTransfer;
-import com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest.FinancialTransactionDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;

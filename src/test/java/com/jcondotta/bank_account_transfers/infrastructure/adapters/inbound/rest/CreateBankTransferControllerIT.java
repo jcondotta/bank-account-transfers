@@ -2,7 +2,6 @@ package com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.res
 
 import com.jcondotta.bank_account_transfers.TestBankAccount;
 import com.jcondotta.bank_account_transfers.TestBankAccountDTO;
-import com.jcondotta.bank_account_transfers.application.services.BankTransferDTO;
 import com.jcondotta.bank_account_transfers.infrastructure.PostgresTestContainer;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -11,8 +10,6 @@ import jakarta.inject.Inject;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,13 +24,10 @@ import org.springframework.test.context.DynamicPropertySource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.time.Instant;
-import java.util.Locale;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -53,7 +47,6 @@ class CreateBankTransferControllerIT {
     private static final BigDecimal TRANSFER_AMOUNT_TWO_HUNDRED = new BigDecimal("200.00");
     private static final String CURRENCY_EURO = "EUR";
     private static final String TRANSFER_REFERENCE = "Playstation 4";
-
 
     private RequestSpecification requestSpecification;
 
@@ -91,23 +84,23 @@ class CreateBankTransferControllerIT {
                 .contentType(ContentType.JSON);
     }
 
-//    @Test
-//    void shouldCreateBankTransfer_whenRequestIsValid() {
-//        MOCK_WEB_SERVER.enqueue(new MockResponse()
-//                .setResponseCode(HttpStatus.OK.value())
-//                .setBody(TestBankAccountDTO.PATRIZIO.getJsonBankAccountDTO())
-//                .addHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-//        );
-//
-//        var request = new CreateBankTransferRequest(
-//                BANK_ACCOUNT_ID_JEFFERSON,
-//                RECIPIENT_IBAN_PATRIZIO,
-//                RECIPIENT_NAME_PATRIZIO,
-//                TRANSFER_AMOUNT_TWO_HUNDRED,
-//                CURRENCY_EURO,
-//                TRANSFER_REFERENCE
-//        );
-//
+    @Test
+    void shouldCreateBankTransfer_whenRequestIsValid() {
+        MOCK_WEB_SERVER.enqueue(new MockResponse()
+                .setResponseCode(HttpStatus.OK.value())
+                .setBody(TestBankAccountDTO.PATRIZIO.getJsonBankAccountDTO())
+                .addHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+        );
+
+        var request = new CreateBankTransferRequest(
+                BANK_ACCOUNT_ID_JEFFERSON,
+                RECIPIENT_IBAN_PATRIZIO,
+                RECIPIENT_NAME_PATRIZIO,
+                TRANSFER_AMOUNT_TWO_HUNDRED,
+                CURRENCY_EURO,
+                TRANSFER_REFERENCE
+        );
+
 //        var validatableResponse = given()
 //                .spec(requestSpecification)
 //                .body(request)
@@ -127,21 +120,21 @@ class CreateBankTransferControllerIT {
 //
 //        String locationHeader = validatableResponse.extract().header("Location");
 //        assertThat(locationHeader).isNotBlank();
+
+//        var fetchedBankTransferDTO = given()
+//                .spec(requestSpecification
+//                        .basePath(locationHeader))
+//            .when()
+//                .get()
+//            .then()
+//                .statusCode(HttpStatus.OK.value())
+//                    .extract()
+//                        .as(BankTransferDTO.class);
 //
-////        var fetchedBankTransferDTO = given()
-////                .spec(requestSpecification
-////                        .basePath(locationHeader))
-////            .when()
-////                .get()
-////            .then()
-////                .statusCode(HttpStatus.OK.value())
-////                    .extract()
-////                        .as(BankTransferDTO.class);
-////
-////        assertThat(createdBankTransferDTO)
-////                .usingRecursiveComparison()
-////                .isEqualTo(fetchedBankTransferDTO);
-//    }
+//        assertThat(createdBankTransferDTO)
+//                .usingRecursiveComparison()
+//                .isEqualTo(fetchedBankTransferDTO);
+    }
 //
 //    @Test
 //    void shouldReturn400BadRequest_whenSenderBankAccountIdIsNull() {
