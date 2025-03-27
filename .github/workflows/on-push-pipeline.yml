@@ -68,7 +68,8 @@ jobs:
           fi
 
       - name: Run Integration Tests with Coverage
-        run: mvn verify -DskipUTs --batch-mode
+        run: |
+          mvn verify -DskipUnitTests=true --batch-mode
 
       - name: Upload Merged Coverage Report
         uses: actions/upload-artifact@v4
