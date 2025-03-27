@@ -2,52 +2,99 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
 
-  build-and-test:
+  unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up JDK and Cache Maven Dependencies
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: 21
           cache: maven
 
-      - name: Compile and Run Unit Tests with JaCoCo
-        run: mvn clean verify --batch-mode
+      - name: Run Unit Tests with Coverage
+        run: mvn clean verify -DskipITs --batch-mode
 
       - name: Upload Unit Test Coverage Report
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-test-report
-          path: target/site/jacoco/jacoco.xml
+          name: jacoco-unit-tests
+          path: target/jacoco-unit-tests.exec
 
-  sonarcloud-analysis:
+  integration-tests:
+    name: Integration Tests
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: unit-tests
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up JDK and Cache Maven Dependencies
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: 21
           cache: maven
 
-      - name: Download Test Coverage Report
+      - name: Restore PostgreSQL Docker Image from Cache
+        id: cache-postgres
+        uses: actions/cache@v3
+        with:
+          path: ~/.docker-cache/postgres
+          key: ${{ runner.os }}-postgres-16-alpine
+
+      - name: Load or Pull PostgreSQL Docker Image
+        run: |
+          if [ -f ~/.docker-cache/postgres/postgres.tar ]; then
+            echo "Loading Postgres Docker image from cache..."
+            docker load -i ~/.docker-cache/postgres/postgres.tar
+          else
+            echo "Pulling Postgres Docker image..."
+            docker pull postgres:16-alpine
+            mkdir -p ~/.docker-cache/postgres
+            docker save postgres:16-alpine -o ~/.docker-cache/postgres/postgres.tar
+          fi
+
+      - name: Run Integration Tests with Coverage
+        run: mvn verify -DskipUTs --batch-mode
+
+      - name: Upload Merged Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-merged-report
+          path: target/site/jacoco/jacoco.xml
+
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 21
+          cache: maven
+
+      - name: Download JaCoCo Report
         uses: actions/download-artifact@v4
         with:
-          name: jacoco-test-report
+          name: jacoco-merged-report
           path: target/site/jacoco
 
       - name: Cache SonarCloud packages
@@ -55,13 +102,12 @@ jobs:
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
 
       - name: Run SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn package -DskipTests=true sonar:sonar \
+          mvn verify -DskipTests sonar:sonar \
             -Dsonar.projectKey=jcondotta_bank-account-transfers \
             -Dsonar.organization=jcondotta \
             -Dsonar.host.url=https://sonarcloud.io \
