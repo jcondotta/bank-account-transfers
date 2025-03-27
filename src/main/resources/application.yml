@@ -18,54 +18,26 @@ spring:
       hibernate:
         format_sql: true
 
-#springdoc:
-#  swagger-ui:
-#    path: /swagger-ui.html
-##    display-request-duration: true
-#    syntax-highlight.theme: "arta"
-##    operationsSorter: "alpha"
-##    tagsSorter: "alpha"
-##    persistAuthorization: true
-#    custom-css: "/static/swagger-custom.css"
-##    custom-js: "/static/swagger-config.js"
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 #TODO adjust it for production
 bank-account-service:
   api:
     v1:
       base-url: 'http://localhost:8080/'
-      find-by-iban:
-        url: 'api/v1/bank-accounts/iban/{iban}'
+      path-url: 'api/v1/bank-accounts/iban/{iban}'
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"  # Expose all available actuator endpoints
-#  metrics:
-#    enable:
-#      all: true
-#    tags:
-#      application: bank-account-transfers  # Add a custom tag to all metrics
-
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
-#  metrics:
-#    enable:
-#      all: true
-#    tags:
-#      application: bank-account-transfers
-
-#aws:
-#  access-key-id: ${AWS_ACCESS_KEY_ID}
-#  secret-key: ${AWS_SECRET_ACCESS_KEY}
-#  region: ${AWS_REGION}
-#
-#  dynamodb:
-#    endpoint: ${AWS_DYNAMODB_ENDPOINT}
-#    tables:
-#      bank-transfer-entity:
-#        table-name: bank_transfer_table
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    enable:
+      all: true
+    tags:
+      application: bank-account-transfers

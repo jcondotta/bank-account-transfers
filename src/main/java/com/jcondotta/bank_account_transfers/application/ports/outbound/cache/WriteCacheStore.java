@@ -4,8 +4,5 @@ public interface WriteCacheStore<K, V> {
 
     void set(K cacheKey, V cacheValue);
 
-    //TODO
-//    default void invalidate(K cacheKey){
-//
-//    }
+    void evict(K cacheKey);
 }

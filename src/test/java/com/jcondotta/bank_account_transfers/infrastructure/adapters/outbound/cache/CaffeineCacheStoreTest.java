@@ -1,6 +1,5 @@
 package com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.cache;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jcondotta.bank_account_transfers.application.ports.outbound.cache.CacheStore;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.Cache;
+import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.support.SimpleValueWrapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,7 @@ class CaffeineCacheStoreTest {
     private static final String CACHE_VALUE = "{\"name\": \"java\"}";
 
     @Mock
-    private Cache<String, String> mockCache;
+    private Cache mockCache;
 
     @Mock
     private Function<String, Optional<String>> valueLoaderMock;
@@ -67,31 +69,26 @@ class CaffeineCacheStoreTest {
 
     @Test
     void shouldReturnCachedValue_whenCacheKeyExists() {
-        when(mockCache.getIfPresent(CACHE_KEY))
-                .thenReturn(CACHE_VALUE);
+        when(mockCache.get(CACHE_KEY)).thenReturn(new SimpleValueWrapper(CACHE_VALUE));
 
-        Optional<String> optCacheValue = cacheStore.get(CACHE_KEY);
-        assertThat(optCacheValue)
+        assertThat(cacheStore.getIfPresent(CACHE_KEY))
                 .isPresent()
                 .hasValue(CACHE_VALUE);
 
-        verify(mockCache).getIfPresent(CACHE_KEY);
+        verify(mockCache).get(CACHE_KEY);
     }
 
     @Test
     void shouldReturnEmptyOption_whenMissingCacheKey() {
-        when(mockCache.getIfPresent(CACHE_KEY))
-                .thenReturn(null);
+        when(mockCache.get(CACHE_KEY)).thenReturn(null);
 
-        Optional<String> optCacheValue = cacheStore.get(CACHE_KEY);
-        assertThat(optCacheValue).isEmpty();
-
-        verify(mockCache).getIfPresent(CACHE_KEY);
+        assertThat(cacheStore.getIfPresent(CACHE_KEY))
+                .isEmpty();
     }
 
     @Test
     void shouldThrowNullPointerException_whenValueLoaderIsNullInGetOrFetch() {
-        assertThatThrownBy(() -> cacheStore.getOrFetch(CACHE_KEY, null))
+        assertThatThrownBy(() -> cacheStore.getOrFetch(CACHE_KEY, (Function<String, Optional<String>>) null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("cache.valueLoader.function.notNull");
 
@@ -99,70 +96,104 @@ class CaffeineCacheStoreTest {
     }
 
     @Test
-    void shouldReturnCachedValue_whenKeyExistsInGetOrFetch(){
-        when(mockCache.get(eq(CACHE_KEY), any())).thenReturn(CACHE_VALUE);
+    @SuppressWarnings("unchecked")
+    void shouldReturnCachedValue_whenKeyExistsInGetOrFetch() {
+        when(mockCache.get(eq(CACHE_KEY), any(Callable.class)))
+                .thenReturn(CACHE_VALUE);
 
         Optional<String> cacheValue = cacheStore.getOrFetch(CACHE_KEY, valueLoaderMock);
+
         assertThat(cacheValue).hasValue(CACHE_VALUE);
 
-        verify(mockCache).get(eq(CACHE_KEY), any());
+        verify(mockCache).get(eq(CACHE_KEY), any(Callable.class));
         verifyNoMoreInteractions(mockCache);
+        verifyNoInteractions(valueLoaderMock);
     }
 
     @Test
     void shouldFetchAndCacheValue_whenCacheMissInGetOrFetch() {
-        when(mockCache.get(eq(CACHE_KEY), any()))
+        when(mockCache.get(eq(CACHE_KEY), any(Callable.class)))
                 .thenAnswer(invocation -> {
-                    Function<String, String> loader = invocation.getArgument(1);
-                    return loader.apply(CACHE_KEY);
+                    Callable<String> loader = invocation.getArgument(1);
+                    return loader.call();
                 });
 
         Optional<String> cacheValue = cacheStore.getOrFetch(CACHE_KEY,
                 key -> Optional.of(CACHE_VALUE));
+
         assertThat(cacheValue).hasValue(CACHE_VALUE);
 
-        verify(mockCache).get(eq(CACHE_KEY), any());
+        verify(mockCache).get(eq(CACHE_KEY), any(Callable.class));
     }
 
     @Test
     void shouldReturnCachedValueAndNotCallValueLoader_whenCachedValueExists() {
-        when(mockCache.get(eq(CACHE_KEY), any())).thenReturn(CACHE_VALUE);
+        when(mockCache.get(eq(CACHE_KEY), any(Callable.class)))
+                .thenReturn(CACHE_VALUE);
 
         Optional<String> cacheValue = cacheStore.getOrFetch(CACHE_KEY, valueLoaderMock);
+
         assertThat(cacheValue).hasValue(CACHE_VALUE);
 
-        verify(mockCache).get(eq(CACHE_KEY), any());
-        verify(valueLoaderMock, never()).apply(anyString());
+        verify(mockCache).get(eq(CACHE_KEY), any(Callable.class));
+        verifyNoInteractions(valueLoaderMock);
     }
 
     @Test
-    void shouldReturnSameCachedValue_whenMultipleThreadsAccessCacheConcurrently() throws ExecutionException, InterruptedException {
-        cacheStore = new CaffeineCacheStore<>(Caffeine.newBuilder()
+    void shouldReturnSameCachedValue_whenMultipleThreadsAccessCacheConcurrently() {
+        Cache springCache = new CaffeineCache("test-cache", Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.SECONDS)
                 .build());
 
+        cacheStore = new CaffeineCacheStore<>(springCache);
+
         when(valueLoaderMock.apply(eq(CACHE_KEY)))
-                .thenAnswer(invocation -> Optional.of(CACHE_VALUE));
+                .thenReturn(Optional.of(CACHE_VALUE));
 
         int threadCount = 4;
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        try{
+
+        try (ExecutorService executor = Executors.newFixedThreadPool(threadCount)) {
             List<Optional<String>> results = IntStream.range(0, threadCount)
-                    .mapToObj(i -> CompletableFuture.supplyAsync(() -> cacheStore.getOrFetch(CACHE_KEY, valueLoaderMock), executor))
+                    .mapToObj(i -> CompletableFuture.supplyAsync(
+                            () -> cacheStore.getOrFetch(CACHE_KEY, valueLoaderMock), executor))
                     .map(CompletableFuture::join)
                     .collect(Collectors.toList());
 
             assertThat(results)
-                    .as("Expected all threads to retrieve the same cached value: %s", CACHE_VALUE)
+                    .as("All threads must retrieve the same cached value: %s", CACHE_VALUE)
                     .isNotEmpty()
                     .allSatisfy(value -> assertThat(value)
-                            .as("Each value should be present and equal to the cached value")
+                            .as("Each value must be present and equal to the cached value")
                             .hasValue(CACHE_VALUE));
 
             verify(valueLoaderMock, times(1)).apply(eq(CACHE_KEY));
         }
-        finally {
-            executor.shutdown();
-        }
+    }
+
+    @Test
+    void shouldThrowNullPointerException_whenInvalidatingNullKey() {
+        assertThatThrownBy(() -> cacheStore.evict(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("cache.key.notNull");
+
+        verify(mockCache, never()).evict(anyString());
+    }
+
+    @Test
+    void shouldEvictCacheEntry_whenEvictingExistingKey() {
+        doNothing().when(mockCache).evict(CACHE_KEY);
+
+        cacheStore.evict(CACHE_KEY);
+
+        verify(mockCache).evict(eq(CACHE_KEY));
+    }
+
+    @Test
+    void shouldDoNothing_whenEvictingNonExistingKey() {
+        doNothing().when(mockCache).evict(CACHE_KEY);
+
+        cacheStore.evict(CACHE_KEY);
+
+        verify(mockCache).evict(eq(CACHE_KEY));
     }
 }

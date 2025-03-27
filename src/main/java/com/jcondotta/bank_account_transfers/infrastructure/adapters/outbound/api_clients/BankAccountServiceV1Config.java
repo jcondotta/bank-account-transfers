@@ -1,53 +1,37 @@
-package com.jcondotta.bank_account_transfers.infrastructure.config;
+package com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.api_clients;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
-import java.util.Objects;
 
 @Configuration
 @ConfigurationProperties(prefix = "bank-account-service.api.v1")
-public class BankAccountServiceV1Config {
+public class BankAccountServiceV1Config implements BankAccountServiceConfig {
 
-    private String baseUrl;
-    private FindByIban findByIban; // ✅ Nested class matches YAML structure
+    private String baseURL;
+    private String pathURL;
 
-    public static class FindByIban {
-        private String url;
+    protected BankAccountServiceV1Config() {}
 
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = Objects.requireNonNull(url, "Find by IBAN URL cannot be null");
-        }
+    public BankAccountServiceV1Config(String baseURL, String pathURL) {
+        this.baseURL = baseURL;
+        this.pathURL = pathURL;
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
+    @Override
+    public String getBaseURL() {
+        return baseURL;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = Objects.requireNonNull(baseUrl, "Base URL cannot be null");
+    public void setBaseURL(String baseURL) {
+        this.baseURL = baseURL;
     }
 
-    public FindByIban getFindByIban() {
-        return findByIban;
+    @Override
+    public String getPathURL() {
+        return pathURL;
     }
 
-    public void setFindByIban(FindByIban findByIban) {
-        this.findByIban = findByIban;
-    }
-
-    public URI findBankAccountByIbanURI(String bankAccountIban) {
-        Objects.requireNonNull(bankAccountIban, "Bank account IBAN cannot be null");
-
-        return UriComponentsBuilder.fromUriString(baseUrl)
-                .path(findByIban.url)
-                .buildAndExpand(bankAccountIban)
-                .toUri();
+    public void setPathURL(String pathURL) {
+        this.pathURL = pathURL;
     }
 }

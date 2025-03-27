@@ -1,16 +1,23 @@
 spring:
   config:
     import: classpath:openapi-config.yml
-  datasource.url
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/bank_account_transfers_db
-#    username: admin
-#    password: admin_password
-#    driver-class-name: org.postgresql.Driver
-#  jpa:
-#    hibernate:
-#      ddl-auto: update # or "validate" if schema is already created
-#    properties:
-#      hibernate:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank_account_transfers_db
+    username: admin
+    password: admin_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # or "validate" if schema is already created
+    properties:
+      hibernate:
 #        dialect: org.hibernate.dialect.PostgreSQLDialect
-#    show-sql: true
+    show-sql: true
+
+bank-account-service:
+  api:
+    v1:
+      base-url: 'http://localhost:8080/'
+      find-by-iban:
+        url: 'api/v1/bank-accounts/iban/{iban}'
+        timeout-in-milliseconds: 200

@@ -12,7 +12,8 @@ import org.springframework.validation.FieldError;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,34 +25,37 @@ public class SpringValidationErrorConverterAdapter implements ValidationErrorCon
     private final LocaleResolverPort localeResolverPort;
 
     public SpringValidationErrorConverterAdapter(MessageResolverPort messageResolverPort,
-            @Qualifier("httpRequestLocaleResolver") LocaleResolverPort localeResolverPort) {
+                                                 @Qualifier("httpRequestLocaleResolver") LocaleResolverPort localeResolverPort) {
         this.messageResolverPort = messageResolverPort;
         this.localeResolverPort = localeResolverPort;
     }
 
     @Override
     public List<FieldValidationError> apply(Collection<FieldError> fieldErrors) {
-        var userLocale = localeResolverPort.resolveLocale();
-        LOGGER.debug("Using locale: {}", userLocale);
+        Locale userLocale = localeResolverPort.resolveLocale();
+        LOGGER.debug("Resolving validation messages with locale: {}", userLocale);
 
-        Function<FieldError, String> resolveMessage = fieldError -> {
-            var messageCode = fieldError.getDefaultMessage();
-            var resolvedMessage = messageResolverPort.resolveMessage(messageCode, userLocale);
-
-            if (resolvedMessage.equals(messageCode)) {
-                LOGGER.warn("Message code '{}' not found, using default.", messageCode);
-            }
-
-            return resolvedMessage;
-        };
-
-        return fieldErrors.stream()
+        Map<String, List<String>> fieldToMessagesMap = fieldErrors.stream()
                 .collect(Collectors.groupingBy(
                         FieldError::getField,
-                        Collectors.mapping(resolveMessage, Collectors.toList())
-                ))
-                .entrySet().stream()
+                        Collectors.mapping(fieldError -> resolveValidationMessage(fieldError, userLocale),
+                                Collectors.toList())
+                ));
+
+        return fieldToMessagesMap.entrySet()
+                .stream()
                 .map(entry -> new FieldValidationError(entry.getKey(), entry.getValue()))
                 .toList();
+    }
+
+    private String resolveValidationMessage(FieldError fieldError, Locale locale) {
+        String messageCode = fieldError.getDefaultMessage();
+        String resolvedMessage = messageResolverPort.resolveMessage(messageCode, locale);
+
+        if (resolvedMessage.equals(messageCode)) {
+            LOGGER.warn("Message code '{}' not found for locale '{}', using default.", messageCode, locale);
+        }
+
+        return resolvedMessage;
     }
 }

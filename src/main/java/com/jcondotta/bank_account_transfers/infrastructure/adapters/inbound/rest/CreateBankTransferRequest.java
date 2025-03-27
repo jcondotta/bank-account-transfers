@@ -1,5 +1,6 @@
 package com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.rest;
 
+import com.jcondotta.bank_account_transfers.domain.validation.Validatable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
@@ -20,11 +21,6 @@ public record CreateBankTransferRequest(
     @Schema(description = "Recipient IBAN (15-34 characters, follows IBAN format)", requiredMode = RequiredMode.REQUIRED, example = "ES3801283316232166447417")
     String recipientIban,
 
-    @NotNull(message = "transfer.recipientName.notNull")
-    @Size(min = 5, max = 100, message = "transfer.recipientName.size")
-    @Schema(description = "Recipient full name (5-100 characters)", requiredMode = RequiredMode.REQUIRED, example = "Jefferson Condotta")
-    String recipientName,
-
     @NotNull(message = "transfer.amount.notNull")
     @Positive(message = "transfer.amount.positive")
     @Digits(integer = 12, fraction = 2, message = "transfer.amount.invalidPrecision")
@@ -37,7 +33,7 @@ public record CreateBankTransferRequest(
     String currency,
 
     @Size(max = 50, message = "transfer.reference.tooLong")
-    @Schema(description = "Optional transfer reference", example = "Invoice 456789")
+    @Schema(description = "transfer reference", example = "Invoice 456789")
     String reference
 
-) {}
+) implements Validatable {}

@@ -28,6 +28,7 @@
 		<!-- test dependencies version -->
 		<mockwebserver.version>4.12.0</mockwebserver.version>
 		<rest-assured.version>5.5.1</rest-assured.version>
+		<testcontainers-postgres.version>1.20.6</testcontainers-postgres.version>
 
 		<skipUnitTests>false</skipUnitTests>
 <!--		<skipITs>false</skipITs>-->
@@ -35,6 +36,7 @@
 		<!-- plugins version -->
 		<maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
 		<maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 
 	</properties>
 
@@ -58,6 +60,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
 
 		<dependency>
@@ -93,13 +99,19 @@
 			<groupId>org.zalando</groupId>
 			<artifactId>problem-spring-web</artifactId>
 			<version>${problem-spring-web.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apiguardian</groupId>
-					<artifactId>apiguardian-api</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>org.zalando</groupId>-->
+<!--			<artifactId>problem-spring-web</artifactId>-->
+<!--			<version>${problem-spring-web.version}</version>-->
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<groupId>org.apiguardian</groupId>-->
+<!--					<artifactId>apiguardian-api</artifactId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
+<!--		</dependency>-->
 
 
 		<!-- Test dependencies -->
@@ -108,11 +120,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-testcontainers</artifactId>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>mockwebserver</artifactId>
@@ -125,17 +132,12 @@
 			<version>${rest-assured.version}</version>
 			<scope>test</scope>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.testcontainers</groupId>-->
-<!--			<artifactId>junit-jupiter</artifactId>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>org.testcontainers</groupId>-->
-<!--			<artifactId>postgresql</artifactId>-->
-<!--&lt;!&ndash;			<version>${testcontainers.version}</version>&ndash;&gt;-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${testcontainers-postgres.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -185,25 +187,21 @@
 				</configuration>
 			</plugin>
 
-<!--&lt;!&ndash;			<plugin>&ndash;&gt;-->
-<!--&lt;!&ndash;				<groupId>org.springframework.boot</groupId>&ndash;&gt;-->
-<!--&lt;!&ndash;				<artifactId>spring-boot-maven-plugin</artifactId>&ndash;&gt;-->
-<!--&lt;!&ndash;			</plugin>&ndash;&gt;-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${mapstruct.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
 
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-compiler-plugin</artifactId>-->
-<!--				<version>3.14.0</version>-->
-<!--				<configuration>-->
-<!--					<annotationProcessorPaths>-->
-<!--						<path>-->
-<!--							<groupId>org.mapstruct</groupId>-->
-<!--							<artifactId>mapstruct-processor</artifactId>-->
-<!--							<version>1.6.3</version>-->
-<!--						</path>-->
-<!--					</annotationProcessorPaths>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
 		</plugins>
 	</build>
 

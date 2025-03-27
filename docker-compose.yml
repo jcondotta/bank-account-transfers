@@ -1,10 +1,9 @@
-version: '3.9'
-
 services:
-  bank-account-transfers-service:
+  app:
     build:
       context: .
-#    container_name: bank-account-transfers-service #TODO think about the docker image
+      target: runner
+    container_name: bank-account-transfers-service
     restart: always
     depends_on:
       postgres:
@@ -13,12 +12,16 @@ services:
       DATASOURCE_URL: jdbc:postgresql://postgres:5432/bank_account_transfers_db
       DATASOURCE_USERNAME: admin
       DATASOURCE_PASSWORD: admin_password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop #TODO ARRUMAR ISSO PRA PRODUCAO
-      SPRING_PROFILES_ACTIVE: dev  # 👈 Set the profile to dev
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
     ports:
       - "8080:8080"
     networks:
-      - bank_account_transfers_network
+      - bank_account_transfers
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
   postgres:
     image: postgres:16-alpine
@@ -33,7 +36,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - bank_account_transfers_network
+      - bank_account_transfers
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U admin -d bank_account_transfers_db || exit 1" ]
       interval: 10s
@@ -42,6 +45,8 @@ services:
 
 volumes:
   postgres_data:
+    name: bank_account_transfers-volume
 
 networks:
-  bank_account_transfers_network:
+  bank_account_transfers:
+    name: bank_account_transfers-network

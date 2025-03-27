@@ -2,20 +2,25 @@ package com.jcondotta.bank_account_transfers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.api_clients.BankAccountDTO;
+import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.api_clients.bank_accounts.BankAccountDTO;
+
+import java.util.List;
 
 public enum TestBankAccountDTO {
 
     JEFFERSON(
             new BankAccountDTO(
                     TestBankAccount.JEFFERSON.getBankAccountId(),
-                    TestBankAccount.JEFFERSON.getIban())
+                    TestBankAccount.JEFFERSON.getIban(),
+                    List.of())
+
     ),
 
     PATRIZIO(
             new BankAccountDTO(
                     TestBankAccount.PATRIZIO.getBankAccountId(),
-                    TestBankAccount.PATRIZIO.getIban())
+                    TestBankAccount.PATRIZIO.getIban(),
+                    List.of())
     );
 
     private final BankAccountDTO bankAccountDTO;
@@ -30,7 +35,7 @@ public enum TestBankAccountDTO {
         return bankAccountDTO;
     }
 
-    public String getJsonBankAccountDTO() {
+    public String getJson() {
         return jsonBankAccountDTO;
     }
 

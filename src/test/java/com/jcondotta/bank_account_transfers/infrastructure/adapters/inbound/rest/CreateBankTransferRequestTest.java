@@ -20,12 +20,11 @@ import static org.assertj.core.api.Assertions.tuple;
 class CreateBankTransferRequestTest {
 
     private static final UUID BANK_ACCOUNT_ID_JEFFERSON = TestBankAccount.JEFFERSON.getBankAccountId();
-    private static final String RECIPIENT_NAME_PATRIZIO = TestBankAccount.PATRIZIO.getAccountHolderName();
     private static final String RECIPIENT_IBAN_PATRIZIO = TestBankAccount.PATRIZIO.getIban();
 
     private static final BigDecimal TRANSFER_AMOUNT_TWO_HUNDRED = new BigDecimal("200.00");
     private static final String CURRENCY_EURO = "EUR";
-    private static final String TRANSFER_REFERENCE = "Playstation 4";
+    private static final String TRANSFER_REFERENCE = "Invoice 437263";
 
     private static final Validator VALIDATOR = TestValidatorConfig.getValidator();
 
@@ -34,7 +33,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -49,7 +47,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 null,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -64,7 +61,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 null,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -80,7 +76,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 tooShortIban,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -96,7 +91,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 tooLongIban,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -107,59 +101,10 @@ class CreateBankTransferRequestTest {
     }
 
     @Test
-    void shouldDetectConstraintViolation_whenRecipientNameIsNull() {
-        var request = new CreateBankTransferRequest(
-                BANK_ACCOUNT_ID_JEFFERSON,
-                RECIPIENT_IBAN_PATRIZIO,
-                null,
-                TRANSFER_AMOUNT_TWO_HUNDRED,
-                CURRENCY_EURO,
-                TRANSFER_REFERENCE
-        );
-
-        var constraintViolations = VALIDATOR.validate(request);
-        assertSingleViolation(constraintViolations, "transfer.recipientName.notNull", "recipientName");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"A", "Ab", "J.C", "Jo"})
-    void shouldDetectConstraintViolation_whenRecipientNameIsShorterThan5Characters(String shortRecipientName) {
-        var request = new CreateBankTransferRequest(
-                BANK_ACCOUNT_ID_JEFFERSON,
-                RECIPIENT_IBAN_PATRIZIO,
-                shortRecipientName,
-                TRANSFER_AMOUNT_TWO_HUNDRED,
-                CURRENCY_EURO,
-                TRANSFER_REFERENCE
-        );
-
-        var constraintViolations = VALIDATOR.validate(request);
-        assertSingleViolation(constraintViolations, "transfer.recipientName.size", "recipientName");
-    }
-
-    @Test
-    void shouldDetectConstraintViolation_whenRecipientNameExceeds100Characters() {
-        var veryLongRecipientName = "J".repeat(101);
-
-        var request = new CreateBankTransferRequest(
-                BANK_ACCOUNT_ID_JEFFERSON,
-                RECIPIENT_IBAN_PATRIZIO,
-                veryLongRecipientName,
-                TRANSFER_AMOUNT_TWO_HUNDRED,
-                CURRENCY_EURO,
-                TRANSFER_REFERENCE
-        );
-
-        var constraintViolations = VALIDATOR.validate(request);
-        assertSingleViolation(constraintViolations, "transfer.recipientName.size", "recipientName");
-    }
-
-    @Test
     void shouldDetectConstraintViolation_whenAmountIsNull() {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 null,
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -175,7 +120,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 new BigDecimal(invalidAmount),
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -190,7 +134,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 new BigDecimal("1000000000000.00"),
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -205,7 +148,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 new BigDecimal("100.123"),
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -220,7 +162,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 new BigDecimal("-20.300"),
                 CURRENCY_EURO,
                 TRANSFER_REFERENCE
@@ -241,7 +182,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 null,
                 TRANSFER_REFERENCE
@@ -257,7 +197,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 invalidCurrency,
                 TRANSFER_REFERENCE
@@ -273,7 +212,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 CURRENCY_EURO,
                 transferReference
@@ -290,7 +228,6 @@ class CreateBankTransferRequestTest {
         var request = new CreateBankTransferRequest(
                 BANK_ACCOUNT_ID_JEFFERSON,
                 RECIPIENT_IBAN_PATRIZIO,
-                RECIPIENT_NAME_PATRIZIO,
                 TRANSFER_AMOUNT_TWO_HUNDRED,
                 CURRENCY_EURO,
                 veryLongTransferReference

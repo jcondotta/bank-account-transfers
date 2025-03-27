@@ -3,7 +3,7 @@ package com.jcondotta.bank_account_transfers.application.ports.outbound.api_clie
 import java.util.Optional;
 
 @FunctionalInterface
-public interface BankAccountLookupPort<T> {
+public interface BankAccountLookupPort<K, V> {
 
-    Optional<T> findBankAccountByIban(String bankAccountIban);
+    Optional<V> findBankAccount(K filterParam);
 }
