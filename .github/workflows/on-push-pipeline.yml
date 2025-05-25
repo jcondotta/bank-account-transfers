@@ -114,31 +114,31 @@ jobs:
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
-  docker-publish:
-    name: Build and Push Docker image to Docker Hub
-    runs-on: ubuntu-latest
-    needs: sonarcloud
-
-    env:
-      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ env.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - name: Build and Push Multi-Arch Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ env.DOCKER_HUB_USERNAME }}/bank-account-transfers:latest
+#  docker-publish:
+#    name: Build and Push Docker image to Docker Hub
+#    runs-on: ubuntu-latest
+#    needs: sonarcloud
+#
+#    env:
+#      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+#
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3
+#
+#      - name: Log in to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ env.DOCKER_HUB_USERNAME }}
+#          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+#
+#      - name: Build and Push Multi-Arch Docker Image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: .
+#          push: true
+#          platforms: linux/amd64,linux/arm64
+#          tags: ${{ env.DOCKER_HUB_USERNAME }}/bank-account-transfers:latest

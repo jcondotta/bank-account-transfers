@@ -3,6 +3,7 @@ package com.jcondotta.bank_account_transfers.infrastructure.adapters.inbound.res
 import com.jcondotta.bank_account_transfers.TestBankAccount;
 import com.jcondotta.bank_account_transfers.TestBankAccountDTO;
 import com.jcondotta.bank_account_transfers.infrastructure.PostgresTestContainer;
+import com.jcondotta.bank_account_transfers.infrastructure.adapters.outbound.api_clients.BankTransferAPIConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -59,6 +60,9 @@ class CreateBankTransferControllerIT {
     private MessageSource errorMessageSource;
 
     @Inject
+    private BankTransferAPIConfig bankTransferAPIConfig;
+
+    @Inject
     Clock testClockUTC;
 
     @BeforeAll
@@ -83,7 +87,7 @@ class CreateBankTransferControllerIT {
     void beforeEach(@LocalServerPort int port) {
         requestSpecification = given()
                 .baseUri("http://localhost:" + port)
-                .basePath(BankTransferAPIPaths.BASE_V1_PATH)
+                .basePath(bankTransferAPIConfig.getRootPath())
                 .contentType(ContentType.JSON);
     }
 

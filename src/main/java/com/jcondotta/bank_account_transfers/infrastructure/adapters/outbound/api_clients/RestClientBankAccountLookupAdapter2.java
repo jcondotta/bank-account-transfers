@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@Primary
+//@Primary
 public class RestClientBankAccountLookupAdapter2 implements BankAccountLookupPort<String, BankAccountDTO> {
 
     @Override

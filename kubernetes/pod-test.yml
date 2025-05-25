@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-pod
+  labels:
+    app: test
+spec:
+  containers:
+    - name: busybox-container
+      image: busybox:latest
+      command: ["sh", "-c", "while true; do echo Hello from pod; sleep 5; done"]
+      env:
+        - name: ENVIRONMENT
+          value: "dev"
+        - name: MESSAGE
+          value: "Learning Kubernetes Pods"
+      volumeMounts:
+        - name: pod-storage
+          mountPath: /data
+  volumes:
+    - name: pod-storage
+      emptyDir: {}
+  restartPolicy: Always

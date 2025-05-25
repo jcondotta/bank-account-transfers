@@ -10,6 +10,8 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -26,8 +28,8 @@ public class CacheConfig {
     }
 
     @Bean
-    public CacheStore<String, BankAccountDTO> bankAccountCacheService(CacheManager cacheManager) {
+    public CacheStore<String, BankAccountDTO> bankAccountCacheService(CacheManager cacheManager, Clock clock) {
         org.springframework.cache.Cache springCache = cacheManager.getCache("bankAccountCache");
-        return new CaffeineCacheStore<>(springCache);
+        return new CaffeineCacheStore<>(springCache, Duration.ofMinutes(10), clock);
     }
 }

@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bank-account-transfers-ingress
+spec:
+  rules:
+    - host: bank.account.transfers
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bank-account-transfers
+                port:
+                  number: 80

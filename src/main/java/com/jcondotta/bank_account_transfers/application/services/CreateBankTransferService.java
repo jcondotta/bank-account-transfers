@@ -37,7 +37,7 @@ public class CreateBankTransferService implements CreateBankTransferUseCase {
         var monetaryAmount = MonetaryAmount.of(request.amount(), request.currency());
         UUID recipientBankAccountId = bankAccountLookupUseCase.findBankAccountByIban(request.recipientIban())
                 .map(BankAccountDTO::bankAccountId)
-                .orElseThrow(() -> new BankAccountNotFoundException("bankAccount.notFound"));
+                .orElseThrow(() -> new BankAccountNotFoundException("bankAccount.notFound", "iban", request.recipientIban()));
 
         return createDoubleEntryTransactionUseCase.createDoubleEntryTransaction(
                 request.senderBankAccountId(),

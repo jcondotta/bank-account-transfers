@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(BankTransferAPIPaths.BASE_V1_PATH)
+@RequestMapping("${api.v1.bank-transfers.root-path}")
 @Tag(name = "Bank Transfers", description = "Endpoint for creating bank transfers.")
 public class CreateBankTransferController {
 
@@ -36,7 +36,7 @@ public class CreateBankTransferController {
     }
 
     @PostMapping
-    @Timed(value = "bankTransfers.createBankTransfer.time", description = "Time taken to create a bank transfer")
+    @Timed(value = "bankTransfers.createBankTransfer.time", description = "Time taken to create a bank transfer", percentiles = {0.5, 0.9, 0.95, 0.99})
     @Operation(summary = "Create a new bank transfer", description = "Creates a new bank transfer using the given request payload and a unique Idempotency-Key.")
     @ApiResponses(value = {
             @ApiResponse(

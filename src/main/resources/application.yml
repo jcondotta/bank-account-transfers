@@ -1,8 +1,6 @@
 spring:
   application:
     name: bank-account-transfers
-#  locale:
-#    default: "en"
 
   datasource:
     url: ${DATASOURCE_URL}
@@ -24,20 +22,38 @@ springdoc:
   swagger-ui:
     enabled: true
 
+api:
+  v1:
+    bank-transfers:
+      root-path: '/api/v1/bank-transfers'
+
 #TODO adjust it for production
 bank-account-service:
   api:
     v1:
-      base-url: 'http://localhost:8080/'
+      base-url: 'http://localhost:8090/'
       path-url: 'api/v1/bank-accounts/iban/{iban}'
 
 management:
   endpoints:
+    enabled-by-default: false
     web:
       exposure:
-        include: "*"
+        include: "health, metrics, prometheus"
+  endpoint:
+    health:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
   metrics:
-    enable:
-      all: true
-    tags:
-      application: bank-account-transfers
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      sla:
+        http:
+          server:
+            requests: 0.1, 0.3, 0.5, 1, 2, 5

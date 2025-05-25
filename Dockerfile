@@ -1,27 +1,39 @@
-# ---- Build Stage ----
-FROM maven:3.9.9-eclipse-temurin-21-alpine AS builder
-WORKDIR /app
+# syntax=docker/dockerfile:1.7
+
+# ---------- Build Stage ----------
+ARG MAVEN_VERSION=3.9.9
+ARG JDK_VERSION=21
+
+FROM --platform=$BUILDPLATFORM maven:${MAVEN_VERSION}-eclipse-temurin-${JDK_VERSION} AS builder
+LABEL stage=builder
+
+WORKDIR /workspace
 
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+      mvn dependency:go-offline -B
 
 COPY src ./src
-RUN mvn clean package -DskipTests
 
-# ---- Runtime Stage ----
-FROM eclipse-temurin:21-jre-alpine AS runner
+RUN --mount=type=cache,target=/root/.m2/repository \
+      mvn -T1C -B clean package -DskipTests
+
+# ---------- Healthcheck Stage ----------
+FROM busybox:1.36.1-glibc AS probe
+
+# ---------- Runtime Stage ----------
+FROM gcr.io/distroless/java21-debian12:nonroot AS runtime
+LABEL stage=runtime
+
 WORKDIR /app
 
-RUN apk add --no-cache curl
-
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-COPY --from=builder /app/target/bank-account-transfers-*.jar ./app.jar
+COPY --from=builder /workspace/target/bank-account-transfers-*.jar ./app.jar
+COPY --from=probe /bin/wget /bin/wget
 
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
 
-ENTRYPOINT ["java", "-XX:+UseG1GC", "-XX:+ExitOnOutOfMemoryError", "-jar", "app.jar"]
+ENTRYPOINT [ "java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=80", "-jar", "/app/app.jar" ]

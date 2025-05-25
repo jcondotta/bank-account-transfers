@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -44,11 +45,18 @@ public class BankAccountRestClientLookupAdapter implements BankAccountLookupPort
                             .header(HttpHeaders.ACCEPT, APPLICATION_JSON_VALUE)
                             .retrieve()
                             .body(BankAccountDTO.class)
-//                    new BankAccountDTO(UUID.randomUUID(), bankAccountIban)
+//                    new BankAccountDTO(UUID.rand+mUUID(), bankAccountIban)
             ).map(bankAccountDTO -> {
-                LOGGER.info("Bank account successfully retrieved: {}", StructuredArguments.f(bankAccountDTO));
+                LOGGER.warn("Bank account successfully retrieved: {}", StructuredArguments.f(bankAccountDTO));
                 return bankAccountDTO;
             });
+        }
+        catch (HttpClientErrorException.NotFound e) {
+            LOGGER.atWarn().setMessage("Bank account not found for IBAN: {}")
+                    .addArgument(bankAccountIban)
+                    .addKeyValue("bankAccountIban", bankAccountIban)
+                    .log();
+            return Optional.empty();
         }
         catch (RestClientResponseException e) {
             LOGGER.atError().setMessage("Bank account lookup failed: {} {} {}")

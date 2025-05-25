@@ -17,7 +17,5 @@ spring:
 bank-account-service:
   api:
     v1:
-      base-url: 'http://localhost:8080/'
-      find-by-iban:
-        url: 'api/v1/bank-accounts/iban/{iban}'
-        timeout-in-milliseconds: 200
+      base-url: 'http://localhost:8090/'
+      path-url: 'api/v1/bank-accounts/iban/{iban}'

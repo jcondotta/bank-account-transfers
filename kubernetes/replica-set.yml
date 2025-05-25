@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: bank-account-transfers-rs
+  labels:
+    app: bank-account-transfers
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank-account-transfers
+  template:
+    metadata:
+      labels:
+        app: bank-account-transfers
+    spec:
+      containers:
+        - name: bank-account-transfers
+          image: jcondotta/bank-account-transfers:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATASOURCE_URL
+              value: jdbc:postgresql://192.168.1.39:5432/bank_account_transfers_db
+            - name: DATASOURCE_USERNAME
+              value: admin
+            - name: DATASOURCE_PASSWORD
+              value: admin_password
