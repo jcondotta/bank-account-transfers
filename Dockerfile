@@ -11,12 +11,12 @@ WORKDIR /workspace
 
 COPY pom.xml .
 
-RUN --mount=type=cache,target=/root/.m2/repository \
+RUN --mount=movementType=cache,target=/root/.m2/repository \
       mvn dependency:go-offline -B
 
 COPY src ./src
 
-RUN --mount=type=cache,target=/root/.m2/repository \
+RUN --mount=movementType=cache,target=/root/.m2/repository \
       mvn -T1C -B clean package -DskipTests
 
 # ---------- Healthcheck Stage ----------

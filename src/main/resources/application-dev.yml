@@ -1,3 +1,11 @@
+aws:
+  access-key-id: test
+  secret-key: test
+  region: us-east-1
+  kinesis:
+    endpoint: 'http://localhost:4568'
+
+
 spring:
   config:
     import: classpath:openapi-config.yml
@@ -8,11 +16,11 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update # or "validate" if schema is already created
+      ddl-auto: create-drop # or "validate" if schema is already created
     properties:
       hibernate:
 #        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+    show-sql: false
 
 bank-account-service:
   api:

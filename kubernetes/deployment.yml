@@ -45,7 +45,7 @@ spec:
 #    matchLabels:
 #      app: bank-account-transfers
 #  strategy:
-#    type: RollingUpdate
+#    movementType: RollingUpdate
 #    rollingUpdate:
 #      maxSurge: 1     # Allow 1 extra pod above desired count during update
 #      maxUnavailable: 1  # Allow 1 pod to be unavailable during update

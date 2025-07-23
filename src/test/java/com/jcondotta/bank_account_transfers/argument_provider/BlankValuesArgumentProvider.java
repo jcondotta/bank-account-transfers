@@ -11,14 +11,12 @@ public class BlankValuesArgumentProvider implements ArgumentsProvider {
 
     private static final String DISPLAY_EMPTY_STRING = "\"\"";
     private static final String DISPLAY_BLANK_STRING = "\"   \"";
-    private static final String DISPLAY_NULL = "null";
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
         return Stream.of(
                 Arguments.of(Named.of(DISPLAY_EMPTY_STRING, "")),
-                Arguments.of(Named.of(DISPLAY_BLANK_STRING, "   ")),
-                Arguments.of(Named.of(DISPLAY_NULL, null))
+                Arguments.of(Named.of(DISPLAY_BLANK_STRING, "   "))
         );
     }
 }

@@ -11,10 +11,17 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop  # For dev/testing only; use 'update' or 'validate' in production
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
+
+aws:
+  region: ${AWS_DEFAULT_REGION}
+  kinesis:
+    streams:
+      request-internal-transfers:
+        stream-name: request-internal-transfers
 
 springdoc:
   api-docs:
@@ -26,6 +33,11 @@ api:
   v1:
     bank-transfers:
       root-path: '/api/v1/bank-transfers'
+
+client:
+  api:
+    bank-account-management:
+      base-url: 'http://localhost:8090'
 
 #TODO adjust it for production
 bank-account-service:

@@ -1,29 +1,4 @@
 services:
-#  bank-account-transfers-service:
-#    image: bank-account-transfers:1.0.0
-#    build:
-#      context: .
-#      target: runtime
-#    container_name: bank-account-transfers-service
-#    restart: on-failure
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#    environment:
-#      DATASOURCE_URL: jdbc:postgresql://postgres:5432/bank_account_transfers_db
-#      DATASOURCE_USERNAME: admin
-#      DATASOURCE_PASSWORD: admin_password
-#      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
-#      SPRING_PROFILES_ACTIVE: dev
-#    ports:
-#      - "8080:8080"
-#    networks:
-#      - bank_account_transfers_network
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/actuator/health" ]
-#      interval: 10s
-#      timeout: 3s
-#      retries: 5
 
   postgres:
     image: postgres:16-alpine
@@ -45,45 +20,30 @@ services:
       retries: 5
       start_period: 10s
 
-  bank-account-management-service:
-    image: jcondotta/bank-account-management:1.0.0
-    container_name: bank-account-management
-    ports:
-      - "8090:8090"
-    environment:
-      MICRONAUT_ENVIRONMENTS: dev
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_DEFAULT_REGION: us-east-1
-      AWS_DYNAMODB_ENDPOINT: http://localstack:4566
-      AWS_SNS_ENDPOINT: http://localstack:4566
-      AWS_DYNAMODB_BANKING_ENTITIES_TABLE_NAME: banking-entities
-      AWS_SNS_ACCOUNT_HOLDER_CREATED_TOPIC_ARN: arn:aws:sns:us-east-1:000000000000:account-holder-created
-    networks:
-      - bank_account_transfers_network
-    depends_on:
-      - localstack
-
   localstack:
     container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
     image: localstack/localstack:3.7.0
     ports:
-      - '127.0.0.1:4566:4566'
+      - '127.0.0.1:4568:4566'
     environment:
-      SERVICES: dynamodb, sns
+      SERVICES: kinesis
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
       AWS_DEFAULT_REGION: us-east-1
       LS_LOG: ${LS_LOG:-debug}
+      DATA_DIR: /var/lib/localstack  # <- Permite persistência no volume
     networks:
       - bank_account_transfers_network
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - ./localstack:/etc/localstack/init/ready.d
+      - bank_account_transfers_localstack_data:/var/lib/localstack  # <- Volume persistente
 
 volumes:
   bank_account_transfers_postgres_data:
     name: bank-account-transfers-postgres-data
+  bank_account_transfers_localstack_data:
+    name: bank-account-transfers-localstack-data
 
 networks:
   bank_account_transfers_network:
